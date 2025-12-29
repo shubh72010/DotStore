@@ -405,4 +405,321 @@
             {
                 id: 'dotbuild',
                 name: 'DotBuild',
-                subtitle: 'AI website maker'
+                subtitle: 'AI website maker',
+                icon: 'fa-code',
+                iconBg: 'bg-green-600',
+                category: 'Developer',
+                description: 'Describe your dream website and watch it come to life. DotBuild uses advanced AI to generate clean, responsive, and modern websites. No coding required, but export-ready for developers.',
+                developer: 'DotAI Corp',
+                size: '450 MB',
+                age: '12+',
+                price: 'Free',
+                screenshots: ['bg-green-700', 'bg-green-600', 'bg-green-500'],
+                whatsNew: 'Launched with AI-powered design suggestions, component library, and direct deployment.',
+                tags: ['AI', 'Developer', 'Web'],
+                featured: false,
+                githubUrl: 'https://github.com/dotai/dotbuild'
+            }
+        ];
+
+        // State
+        let installedApps = new Set();
+        let currentFilter = 'All';
+        let searchTerm = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderApps();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                resetFilters(); // Clear category filters when searching
+                renderApps();
+            });
+
+            // Categories
+            document.getElementById('categoryContainer').addEventListener('click', (e) => {
+                if (e.target.classList.contains('category-pill')) {
+                    // Reset navigation links
+                    resetNavLinks();
+                    // Update category pills
+                    updateCategoryPills(e.target.textContent);
+                    currentFilter = e.target.textContent;
+                    searchTerm = ''; // Clear search on category change
+                    document.getElementById('searchInput').value = '';
+                    renderApps();
+                }
+            });
+
+            // Navigation Links (Today, Games, Apps, Arcade)
+            document.getElementById('navLinksContainer')?.addEventListener('click', handleNavClick);
+            // Add event listener directly to nav links as container might not exist
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    handleNavClick(e);
+                });
+            });
+
+            // See All Button
+            document.getElementById('seeAllBtn').addEventListener('click', () => {
+                updateCategoryPills('All');
+                resetNavLinks();
+                currentFilter = 'All';
+                searchTerm = '';
+                document.getElementById('searchInput').value = '';
+                renderApps();
+                showToast('Showing all apps');
+            });
+
+            // Modal Install Button
+            document.getElementById('modalInstallBtn').addEventListener('click', function() {
+                const appName = document.getElementById('modalTitle').textContent;
+                const appId = this.getAttribute('data-app-id');
+                const app = apps.find(a => a.id === appId);
+                
+                if (app && app.githubUrl) {
+                    // Mark as installed
+                    if (!installedApps.has(appId)) {
+                        installedApps.add(appId);
+                        updateInstallButton(this, true);
+                        updateAppCardButton(appId, true);
+                    }
+                    // Open GitHub page
+                    window.open(app.githubUrl, '_blank');
+                    showToast(`Opening ${appName} on GitHub`);
+                }
+            });
+
+            // Close modal on backdrop click
+            document.getElementById('appModal').addEventListener('click', (e) => {
+                if (e.target.id === 'appModal') {
+                    closeModal();
+                }
+            });
+        }
+
+        function handleNavClick(e) {
+            const link = e.target.closest('.nav-link');
+            if (!link) return;
+
+            e.preventDefault();
+            const filter = link.getAttribute('data-filter');
+
+            // Update active state for nav links
+            resetNavLinks();
+            link.classList.add('active', 'text-gray-900');
+            link.classList.remove('text-gray-500');
+
+            // Reset category pills
+            resetCategoryPills();
+
+            currentFilter = filter;
+            searchTerm = '';
+            document.getElementById('searchInput').value = '';
+            renderApps();
+            showToast(`Filtered by ${filter}`);
+        }
+
+        function renderApps() {
+            const grid = document.getElementById('appGrid');
+            
+            // Filter apps
+            let filteredApps = apps.filter(app => {
+                // Search Filter
+                const matchesSearch = app.name.toLowerCase().includes(searchTerm) || 
+                                     app.subtitle.toLowerCase().includes(searchTerm) ||
+                                     app.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                
+                // Category/Tab Filter
+                let matchesCategory = false;
+                if (currentFilter === 'All') {
+                    matchesCategory = true;
+                } else if (currentFilter === 'Today') {
+                    matchesCategory = app.featured;
+                } else if (currentFilter === 'Apps' || currentFilter === 'Productivity' || currentFilter === 'Utilities' || currentFilter === 'Developer') {
+                    matchesCategory = app.category === currentFilter || app.tags.includes(currentFilter);
+                } else {
+                    // Games, Arcade, Lifestyle
+                    matchesCategory = app.category === currentFilter;
+                }
+
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filteredApps.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="text-6xl mb-4">🔍</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">No apps found</h3>
+                        <p class="text-gray-500">Try adjusting your search or filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredApps.map(app => `
+                <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border border-gray-100 hover:border-gray-200" onclick="openAppModal('${app.id}')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="app-icon-wrapper w-14 h-14 ${app.iconBg} rounded-xl flex items-center justify-center text-white text-xl shadow-md">
+                            <i class="fas ${app.icon}"></i>
+                        </div>
+                        ${app.featured ? '<span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">NEW</span>' : ''}
+                    </div>
+                    
+                    <h3 class="font-bold text-gray-900 text-sm mb-1 truncate">${app.name}</h3>
+                    <p class="text-gray-500 text-xs mb-3 line-clamp-2 h-8">${app.subtitle}</p>
+                    
+                    <div class="flex items-center justify-between mt-3">
+                        <button onclick="event.stopPropagation(); toggleInstall('${app.id}', this)" 
+                                class="install-btn text-white text-xs px-3 py-1.5 rounded-full font-medium ${installedApps.has(app.id) ? 'installed' : ''}">
+                            ${installedApps.has(app.id) ? '<i class="fas fa-check"></i>' : 'GET'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleInstall(appId, button) {
+            const app = apps.find(a => a.id === appId);
+            if (!app) return;
+
+            if (installedApps.has(appId)) {
+                // Already installed - open modal
+                openAppModal(appId);
+            } else {
+                // Install
+                installedApps.add(appId);
+                updateInstallButton(button, true);
+                window.open(app.githubUrl, '_blank');
+                showToast(`Opening ${app.name} on GitHub`);
+            }
+        }
+
+        function updateInstallButton(button, installed) {
+            if (installed) {
+                button.classList.add('installed');
+                button.innerHTML = '<i class="fas fa-check"></i>';
+            } else {
+                button.classList.remove('installed');
+                button.innerHTML = 'GET';
+            }
+        }
+
+        function updateAppCardButton(appId, installed) {
+            const gridButtons = document.querySelectorAll(`[onclick*="toggleInstall('${appId}'"]`);
+            gridButtons.forEach(btn => {
+                if (installed) {
+                    btn.classList.add('installed');
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                }
+            });
+        }
+
+        function openAppModal(appId) {
+            const app = apps.find(a => a.id === appId);
+            if (!app) return;
+
+            document.getElementById('modalTitle').textContent = app.name;
+            document.getElementById('modalSubtitle').textContent = app.subtitle;
+            document.getElementById('modalDescription').textContent = app.description;
+            document.getElementById('modalDeveloper').textContent = app.developer;
+            document.getElementById('modalCategory').textContent = app.category;
+            document.getElementById('modalSize').textContent = app.size;
+            document.getElementById('modalAge').textContent = app.age;
+            document.getElementById('modalPrice').textContent = app.price;
+            document.getElementById('modalWhatsNew').textContent = app.whatsNew;
+            
+            const iconEl = document.getElementById('modalIcon');
+            iconEl.className = `w-16 h-16 ${app.iconBg} rounded-xl flex items-center justify-center text-white text-2xl shadow-lg app-detail-icon`;
+            iconEl.innerHTML = `<i class="fas ${app.icon}"></i>`;
+
+            const screenshotsContainer = document.getElementById('modalScreenshots');
+            screenshotsContainer.innerHTML = app.screenshots.map(color => `
+                <div class="screenshot-image ${color} flex-shrink-0 flex items-center justify-center text-white/20 text-3xl">
+                    <i class="fas fa-image"></i>
+                </div>
+            `).join('');
+
+            const installBtn = document.getElementById('modalInstallBtn');
+            installBtn.setAttribute('data-app-id', appId);
+            const isInstalled = installedApps.has(appId);
+            updateInstallButton(installBtn, isInstalled);
+            installBtn.querySelector('span').textContent = isInstalled ? 'VIEW' : 'GET';
+
+            const modal = document.getElementById('appModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('appModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 0)';
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 2rem)';
+            }, 3000);
+        }
+
+        // --- UI State Helper Functions ---
+
+        function updateCategoryPills(filter) {
+            document.querySelectorAll('.category-pill').forEach(btn => {
+                if (btn.textContent === filter) {
+                    btn.classList.add('active', 'bg-gray-900', 'text-white');
+                    btn.classList.remove('bg-white', 'text-gray-700');
+                } else {
+                    btn.classList.remove('active', 'bg-gray-900', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-700');
+                }
+            });
+        }
+
+        function resetCategoryPills() {
+            document.querySelectorAll('.category-pill').forEach(btn => {
+                btn.classList.remove('active', 'bg-gray-900', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            // Set 'All' as active
+            const allBtn = document.querySelector('.category-pill');
+            if (allBtn) {
+                allBtn.classList.add('active', 'bg-gray-900', 'text-white');
+                allBtn.classList.remove('bg-white', 'text-gray-700');
+            }
+        }
+
+        function resetNavLinks() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active', 'text-gray-900');
+                link.classList.add('text-gray-500');
+            });
+        }
+
+        function resetFilters() {
+            currentFilter = 'All';
+            resetCategoryPills();
+            resetNavLinks();
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
