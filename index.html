@@ -3,407 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DotStore - App Marketplace</title>
+    <title>DotStore - App Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Custom Styles & Animations */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* Slate 900 */
-            color: #e2e8f0;
+        body { font-family: 'Inter', sans-serif; }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(30, 41, 59, 0.9);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        .app-icon {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            box-shadow: 0 8px 16px rgba(168, 85, 247, 0.25);
+        .app-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .glass-card:hover .app-icon {
-            transform: scale(1.05);
-            box-shadow: 0 12px 24px rgba(168, 85, 247, 0.4);
+        .app-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        .btn-primary {
-            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        .skeleton {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .install-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             transition: all 0.2s;
         }
-        
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
+
+        .install-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .install-btn.installed {
+            background: #10b981;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.4);
         }
 
-        /* Floating background shapes */
-        .blob {
-            position: absolute;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.4;
-            animation: float 10s infinite ease-in-out;
+        .floating {
+            animation: float 6s ease-in-out infinite;
         }
-        
+
         @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(20px, -20px); }
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
-        /* Modal Transitions */
-        .modal {
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .badge {
+            font-size: 0.65rem;
+            letter-spacing: 0.025em;
         }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
+
+        .app-icon-wrapper {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+
+        .app-icon-wrapper:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        ::-webkit-scrollbar-track {
-            background: #0f172a; 
+
+        .screenshot-slider {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #334155; 
-            border-radius: 4px;
+
+        .screenshot-slider::-webkit-scrollbar {
+            display: none;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569; 
+
+        .category-pill {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .category-pill:hover, .category-pill.active {
+            background: #1f2937;
+            color: white;
+        }
+
+        .nav-link {
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #111827;
+            border-bottom: 2px solid #111827;
+        }
+
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+        }
+
+        .app-detail-icon {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .screenshot-image {
+            width: 200px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="min-h-screen relative overflow-x-hidden">
+<body class="bg-gray-50">
 
-    <!-- Background Blobs -->
-    <div class="blob bg-indigo-600 w-96 h-96 rounded-full top-0 left-0"></div>
-    <div class="blob bg-purple-600 w-80 h-80 rounded-full bottom-0 right-0" style="animation-delay: 2s;"></div>
-
-    <!-- Navbar -->
-    <nav class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-bold">D</div>
-                    <span class="font-bold text-xl tracking-tight text-white">DotStore</span>
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <div class="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-cube text-white"></i>
+                        </div>
+                        <span class="font-bold text-xl text-gray-900">DotStore</span>
+                    </div>
+                    <div class="hidden md:ml-8 md:flex md:space-x-4">
+                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Today">Today</a>
+                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Games">Games</a>
+                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Apps">Apps</a>
+                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Arcade">Arcade</a>
+                    </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button onclick="openPage('home')" class="text-slate-300 hover:text-white transition hidden sm:block">Discover</button>
-                    <button onclick="openPage('categories')" class="text-slate-300 hover:text-white transition hidden sm:block">Categories</button>
-                    <div class="relative">
-                        <input type="text" placeholder="Search apps..." class="bg-slate-800 text-sm text-slate-200 rounded-full px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32 focus:w-64 transition-all">
+                    <div class="relative hidden md:block">
+                        <input type="text" id="searchInput" placeholder="Search apps..." 
+                               class="pl-9 pr-4 py-1.5 bg-gray-100 border-transparent focus:bg-white focus:border-blue-500 rounded-full text-sm w-64 transition-all">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>
-                    <button class="btn-primary text-white px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
-                        <span>Sign In</span>
-                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="pt-20 pb-8">
         
-        <!-- Hero / Featured Section -->
-        <div id="home" class="page-section">
-            <div class="mb-8">
-                <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Featured Apps</h1>
-                <p class="text-slate-400">Hand-picked for your productivity and creativity.</p>
-            </div>
-
-            <!-- App Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- App Card: DotBot -->
-                <div class="glass-card rounded-2xl p-5 cursor-pointer group" onclick="showAppDetails('dotbot')">
-                    <div class="flex items-start gap-4">
-                        <div class="app-icon w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shrink-0">
-                            🤖
+        <!-- Hero Section -->
+        <div class="hero-gradient border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                            Discover amazing <br>
+                            <span class="gradient-text">AI-powered apps</span>
+                        </h1>
+                        <p class="text-gray-600 text-lg mb-6">
+                            The best collection of productivity and lifestyle apps built for the modern era. 
+                            Handpicked quality apps for your daily needs.
+                        </p>
+                        <div class="flex gap-3">
+                            <span class="px-3 py-1 bg-gray-900 text-white rounded-full text-sm font-medium">Featured</span>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">New Apps</span>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start">
-                                <h3 class="font-bold text-lg text-white truncate">DotBot</h3>
-                                <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">AI</span>
+                    </div>
+                    <div class="relative hidden md:block">
+                        <div class="absolute -top-6 -right-6 w-32 h-32 bg-purple-200 rounded-full opacity-50 floating"></div>
+                        <div class="absolute -bottom-4 -left-4 w-24 h-24 bg-blue-200 rounded-full opacity-50 floating" style="animation-delay: 1s;"></div>
+                        <div class="relative bg-white rounded-3xl shadow-xl p-8 transform rotate-2 border border-gray-100">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center text-white text-xl">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-900">DotBot</div>
+                                    <div class="text-sm text-gray-500">Run AI locally</div>
+                                </div>
                             </div>
-                            <p class="text-slate-400 text-sm mt-1 line-clamp-2">Run powerful AI models locally. Private, fast, and offline-ready LLM runner.</p>
-                            <div class="mt-3 flex items-center justify-between">
-                                <span class="text-xs text-slate-500">Utility</span>
-                                <span class="text-indigo-400 font-medium text-sm">Free</span>
+                            <div class="space-y-2">
+                                <div class="h-2 bg-gray-100 rounded w-3/4"></div>
+                                <div class="h-2 bg-gray-100 rounded w-1/2"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- App Card: VibeLauncher -->
-                <div class="glass-card rounded-2xl p-5 cursor-pointer group" onclick="showAppDetails('vibe')">
-                    <div class="flex items-start gap-4">
-                        <div class="app-icon w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shrink-0" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 16px rgba(16, 185, 129, 0.25);">
-                            ◎
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start">
-                                <h3 class="font-bold text-lg text-white truncate">VibeLauncher</h3>
-                                <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">Custom</span>
-                            </div>
-                            <p class="text-slate-400 text-sm mt-1 line-clamp-2">A homescreen launcher that embraces minimalism. Distraction-free computing.</p>
-                            <div class="mt-3 flex items-center justify-between">
-                                <span class="text-xs text-slate-500">Productivity</span>
-                                <span class="text-emerald-400 font-medium text-sm">$4.99</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- App Card: DotNotes -->
-                <div class="glass-card rounded-2xl p-5 cursor-pointer group" onclick="showAppDetails('notes')">
-                    <div class="flex items-start gap-4">
-                        <div class="app-icon w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shrink-0" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); box-shadow: 0 8px 16px rgba(236, 72, 153, 0.25);">
-                            📝
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start">
-                                <h3 class="font-bold text-lg text-white truncate">DotNotes</h3>
-                                <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">AI</span>
-                            </div>
-                            <p class="text-slate-400 text-sm mt-1 line-clamp-2">Smart notes app with auto-summarization. Turn chaos into clarity instantly.</p>
-                            <div class="mt-3 flex items-center justify-between">
-                                <span class="text-xs text-slate-500">Education</span>
-                                <span class="text-pink-400 font-medium text-sm">Free</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Placeholder Cards for "More" feel -->
-                <div class="glass-card rounded-2xl p-5 opacity-50 hover:opacity-100 transition">
-                    <div class="flex items-start gap-4">
-                        <div class="w-16 h-16 bg-slate-700 rounded-xl flex items-center justify-center text-slate-400 text-2xl shrink-0">?</div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-lg text-slate-300">Coming Soon</h3>
-                            <p class="text-slate-500 text-sm mt-1">More apps are being developed.</p>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
 
-        <!-- Hidden Categories Page (demonstrating simple SPA routing) -->
-        <div id="categories" class="page-section hidden">
-            <h2 class="text-2xl font-bold text-white mb-6">Explore Categories</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
-                    <span class="block text-xl mb-1">🤖</span>
-                    <span class="font-semibold text-white">AI & Machine Learning</span>
-                </button>
-                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
-                    <span class="block text-xl mb-1">⚡</span>
-                    <span class="font-semibold text-white">Productivity</span>
-                </button>
-                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
-                    <span class="block text-xl mb-1">🎨</span>
-                    <span class="font-semibold text-white">Design</span>
-                </button>
-                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
-                    <span class="block text-xl mb-1">🛠️</span>
-                    <span class="font-semibold text-white">Utilities</span>
-                </button>
+        <!-- Categories -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex gap-3 overflow-x-auto pb-2" id="categoryContainer">
+                <button class="category-pill active px-4 py-2 rounded-full bg-gray-900 text-white text-sm font-medium whitespace-nowrap">All</button>
+                <button class="category-pill px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium whitespace-nowrap">Productivity</button>
+                <button class="category-pill px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium whitespace-nowrap">Utilities</button>
+                <button class="category-pill px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium whitespace-nowrap">Developer</button>
+            </div>
+        </div>
+
+        <!-- App Grid -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-900">Essential Apps</h2>
+                <button id="seeAllBtn" class="text-blue-600 text-sm font-medium hover:text-blue-800">See All</button>
+            </div>
+            
+            <div id="appGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Apps will be injected here by JS -->
+            </div>
+        </div>
+
+        <!-- Featured Section -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-gray-900 rounded-3xl p-8 text-white overflow-hidden relative">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-bold">FEATURED</span>
+                        <span class="text-gray-400 text-sm">App of the Day</span>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-2">DotBuild</h2>
+                    <p class="text-gray-300 mb-6 max-w-lg">Create beautiful websites with AI. Just describe what you want and get a fully functional site in seconds. The future of web development is here.</p>
+                    <button onclick="openAppModal('dotbuild')" class="bg-white text-gray-900 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                        Learn More
+                    </button>
+                </div>
             </div>
         </div>
 
     </main>
 
-    <!-- App Detail Modal -->
-    <div id="appModal" class="modal fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm" onclick="closeModal()"></div>
-        
-        <!-- Modal Content -->
-        <div class="glass-card w-full max-w-2xl rounded-2xl relative overflow-hidden flex flex-col md:flex-row max-h-[90vh] shadow-2xl bg-slate-900 border-slate-700">
-            
-            <!-- Close Button -->
-            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-
-            <!-- Modal Left: Info -->
-            <div class="p-6 md:p-8 flex-1 overflow-y-auto">
-                <div id="modalContent">
-                    <!-- Content injected via JS -->
-                </div>
-            </div>
-
-            <!-- Modal Right: Action (Visual Sidebar on desktop, bottom on mobile) -->
-            <div class="bg-slate-800/50 p-6 md:p-8 border-t md:border-t-0 md:border-l border-slate-700 flex flex-col justify-center items-center gap-4 min-w-[200px]">
-                <div id="modalPrice" class="text-2xl font-bold text-white">$0.00</div>
-                <div class="flex gap-2 w-full">
-                    <button class="btn-primary flex-1 text-white font-semibold py-2.5 rounded-lg shadow-lg">Get</button>
-                </div>
-                <div class="text-xs text-slate-400 text-center">One-time purchase</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // App Data Store
-        const apps = {
-            dotbot: {
-                name: "DotBot",
-                icon: "🤖",
-                iconColor: "bg-indigo-600",
-                category: "Utility / AI",
-                price: "Free",
-                tag: "Local AI",
-                description: "DotBot brings the power of Large Language Models directly to your desktop without the cloud. Your data never leaves your machine.",
-                features: [
-                    "Runs Llama 2 & Mistral models",
-                    "100% Offline & Private",
-                    "Easy to use UI",
-                    "Extension support",
-                    "GPU Acceleration"
-                ],
-                screenshotBg: "bg-indigo-900/40"
-            },
-            vibe: {
-                name: "VibeLauncher",
-                icon: "◎",
-                iconColor: "bg-emerald-600",
-                category: "Productivity",
-                price: "$4.99",
-                tag: "Minimal",
-                description: "Strip away the noise. VibeLauncher reimagines your desktop as a calm, focused space. No widgets, no clutter, just your tools.",
-                features: [
-                    "Radical minimalism",
-                    "Dynamic wallpaper sync",
-                    "Keyboard-first navigation",
-                    "Tiny memory footprint",
-                    "Dark & Light modes"
-                ],
-                screenshotBg: "bg-emerald-900/40"
-            },
-            notes: {
-                name: "DotNotes",
-                icon: "📝",
-                iconColor: "bg-pink-600",
-                category: "Education",
-                price: "Free",
-                tag: "Smart Notes",
-                description: "Write freely, then let AI do the heavy lifting. DotNotes analyzes your text to generate summaries, flashcards, and action items.",
-                features: [
-                    "Real-time AI summary",
-                    "Smart tagging system",
-                    "Markdown export",
-                    "End-to-end encryption",
-                    "Cross-device sync"
-                ],
-                screenshotBg: "bg-pink-900/40"
-            }
-        };
-
-        // Show App Details Modal
-        function showAppDetails(appId) {
-            const app = apps[appId];
-            if (!app) return;
-
-            const modal = document.getElementById('appModal');
-            const content = document.getElementById('modalContent');
-            const price = document.getElementById('modalPrice');
-
-            // Generate HTML
-            content.innerHTML = `
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-16 h-16 ${app.iconColor} rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                        ${app.icon}
+    <!-- App Modal -->
+    <div id="appModal" class="hidden fixed inset-0 z-[100] overflow-y-auto modal-backdrop" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                
+                <!-- Modal Header -->
+                <div class="bg-gray-50 px-6 py-5 border-b border-gray-200 flex justify-between items-start">
+                    <div class="flex gap-4">
+                        <div id="modalIcon" class="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center text-white text-2xl shadow-lg">
+                        </div>
+                        <div>
+                            <h3 id="modalTitle" class="text-xl font-bold text-gray-900"></h3>
+                            <p id="modalSubtitle" class="text-sm text-gray-500"></p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-white">${app.name}</h2>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-xs text-slate-400">${app.category}</span>
-                            <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
-                            <span class="text-xs font-medium text-indigo-400">${app.tag}</span>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="px-6 py-6 overflow-y-auto max-h-[60vh]">
+                    <!-- Screenshots -->
+                    <div class="mb-6">
+                        <div class="flex gap-3 overflow-x-auto screenshot-slider pb-2" id="modalScreenshots">
+                            <!-- Screenshots injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-2">About</h4>
+                            <p id="modalDescription" class="text-gray-600 leading-relaxed"></p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-2">Information</h4>
+                            <div class="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Developer</span>
+                                    <span id="modalDeveloper" class="font-medium text-gray-900"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Category</span>
+                                    <span id="modalCategory" class="font-medium text-gray-900"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Size</span>
+                                    <span id="modalSize" class="font-medium text-gray-900"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Age Rating</span>
+                                    <span id="modalAge" class="font-medium text-gray-900"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Price</span>
+                                    <span id="modalPrice" class="font-bold text-blue-600"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-2">What's New</h4>
+                            <p id="modalWhatsNew" class="text-gray-600 text-sm"></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="${app.screenshotBg} w-full h-32 rounded-lg mb-6 flex items-center justify-center text-slate-500 border border-slate-700/50 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                    <span class="font-mono text-sm opacity-50">App Preview Area</span>
+                <!-- Modal Footer -->
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end items-center">
+                    <button id="modalInstallBtn" class="install-btn text-white px-8 py-2.5 rounded-full font-semibold shadow-lg flex items-center gap-2">
+                        <i class="fas fa-download"></i>
+                        <span>GET</span>
+                    </button>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <p class="text-slate-300 leading-relaxed mb-6">${app.description}</p>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-8 z-[101] flex items-center gap-3">
+        <i class="fas fa-external-link-alt text-green-400"></i>
+        <span id="toastMessage" class="font-medium"></span>
+    </div>
 
-                <h4 class="text-white font-semibold mb-3">Key Features</h4>
-                <ul class="space-y-2">
-                    ${app.features.map(f => `
-                        <li class="flex items-center gap-2 text-slate-400 text-sm">
-                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            ${f}
-                        </li>
-                    `).join('')}
-                </ul>
-            `;
-
-            price.textContent = app.price;
-            
-            // Animation
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('appModal');
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // Simple SPA Router
-        function openPage(pageId) {
-            const sections = document.querySelectorAll('.page-section');
-            sections.forEach(sec => {
-                if (sec.id === pageId) {
-                    sec.classList.remove('hidden');
-                    // Small fade in effect
-                    sec.classList.add('animate-fade-in');
-                } else {
-                    sec.classList.add('hidden');
-                }
-            });
-        }
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-    </script>
-</body>
-</html>
+    <script>
+        // App Data
+        const apps = [
+            {
+                id: 'dotbot',
+                name: 'DotBot',
+                subtitle: 'Run AI locally on your device',
+                icon: 'fa-robot',
+                iconBg: 'bg-gray-900',
+                category: 'Utilities',
+                description: 'DotBot brings the power of local AI directly to your device. Run language models, generate images, and process data without relying on cloud services. Privacy-first, blazing fast, and offline capable.',
+                developer: 'DotAI Corp',
+                size: '245 MB',
+                age: '4+',
+                price: 'Free',
+                screenshots: ['bg-gray-800', 'bg-gray-700', 'bg-gray-600'],
+                whatsNew: 'Added support for new LLM models, improved inference speed by 40%, and dark mode UI enhancements.',
+                tags: ['AI', 'Offline', 'Privacy'],
+                featured: true,
+                githubUrl: 'https://github.com/dotai/dotbot'
+            },
+            {
+                id: 'vibelauncher',
+                name: 'VibeLauncher',
+                subtitle: 'Minimalist homescreen launcher',
+                icon: 'fa-rocket',
+                iconBg: 'bg-purple-600',
+                category: 'Lifestyle',
+                description: 'Transform your device into a distraction-free zone. VibeLauncher offers a radically minimal interface that focuses on what matters. Custom widgets, gesture controls, and beautiful typography.',
+                developer: 'Vibe Studios',
+                size: '89 MB',
+                age: '4+',
+                price: 'Free',
+                screenshots: ['bg-purple-700', 'bg-purple-600', 'bg-purple-500'],
+                whatsNew: 'New gesture navigation system, 20+ new icon packs, and improved battery optimization.',
+                tags: ['Productivity', 'Customization'],
+                featured: false,
+                githubUrl: 'https://github.com/vibestudios/vibelauncher'
+            },
+            {
+                id: 'dotnotes',
+                name: 'DotNotes',
+                subtitle: 'Notes app with AI summary',
+                icon: 'fa-pen-fancy',
+                iconBg: 'bg-blue-600',
+                category: 'Productivity',
+                description: 'Take notes naturally and let AI handle the organization. DotNotes automatically summarizes your thoughts, creates to-do lists, and finds connections between your notes. Smart, simple, and powerful.',
+                developer: 'DotAI Corp',
+                size: '156 MB',
+                age: '4+',
+                price: 'Free',
+                screenshots: ['bg-blue-700', 'bg-blue-600', 'bg-blue-500'],
+                whatsNew: 'AI summary feature improvements, new rich text editor, and iCloud sync support.',
+                tags: ['AI', 'Productivity', 'Notes'],
+                featured: false,
+                githubUrl: 'https://github.com/dotai/dotnotes'
+            },
+            {
+                id: 'dotbuild',
+                name: 'DotBuild',
+                subtitle: 'AI website maker'
