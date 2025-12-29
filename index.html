@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotStore - App Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles & Animations */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            box-shadow: 0 8px 16px rgba(168, 85, 247, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover .app-icon {
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Floating background shapes */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 10s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+        }
+
+        /* Modal Transitions */
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+
+    <!-- Background Blobs -->
+    <div class="blob bg-indigo-600 w-96 h-96 rounded-full top-0 left-0"></div>
+    <div class="blob bg-purple-600 w-80 h-80 rounded-full bottom-0 right-0" style="animation-delay: 2s;"></div>
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-bold">D</div>
+                    <span class="font-bold text-xl tracking-tight text-white">DotStore</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="openPage('home')" class="text-slate-300 hover:text-white transition hidden sm:block">Discover</button>
+                    <button onclick="openPage('categories')" class="text-slate-300 hover:text-white transition hidden sm:block">Categories</button>
+                    <div class="relative">
+                        <input type="text" placeholder="Search apps..." class="bg-slate-800 text-sm text-slate-200 rounded-full px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32 focus:w-64 transition-all">
+                    </div>
+                    <button class="btn-primary text-white px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <span>Sign In</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Hero / Featured Section -->
+        <div id="home" class="page-section">
+            <div class="mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Featured Apps</h1>
+                <p class="text-slate-400">Hand-picked for your productivity and creativity.</p>
+            </div>
+
+            <!-- App Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- App Card: DotBot -->
+                <div class="glass-card rounded-2xl p-5 cursor-pointer group" onclick="showAppDetails('dotbot')">
+                    <div class="flex items-start gap-4">
+                        <div class="app-icon w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shrink-0">
+                            🤖
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-white truncate">DotBot</h3>
+                                <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">AI</span>
+                            </div>
+                            <p class="text-slate-400 text-sm mt-1 line-clamp-2">Run powerful AI models locally. Private, fast, and offline-ready LLM runner.</p>
+                            <div class="mt-3 flex items-center justify-between">
+                                <span class="text-xs text-slate-500">Utility</span>
+                                <span class="text-indigo-400 font-medium text-sm">Free</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Card: VibeLauncher -->
+                <div class="glass-card rounded-2xl p-5 cursor-pointer group" onclick="showAppDetails('vibe')">
+                    <div class="flex items-start gap-4">
+                        <div class="app-icon w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shrink-0" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 16px rgba(16, 185, 129, 0.25);">
+                            ◎
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-white truncate">VibeLauncher</h3>
+                                <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">Custom</span>
+                            </div>
+                            <p class="text-slate-400 text-sm mt-1 line-clamp-2">A homescreen launcher that embraces minimalism. Distraction-free computing.</p>
+                            <div class="mt-3 flex items-center justify-between">
+                                <span class="text-xs text-slate-500">Productivity</span>
+                                <span class="text-emerald-400 font-medium text-sm">$4.99</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Card: DotNotes -->
+                <div class="glass-card rounded-2xl p-5 cursor-pointer group" onclick="showAppDetails('notes')">
+                    <div class="flex items-start gap-4">
+                        <div class="app-icon w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shrink-0" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); box-shadow: 0 8px 16px rgba(236, 72, 153, 0.25);">
+                            📝
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-white truncate">DotNotes</h3>
+                                <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">AI</span>
+                            </div>
+                            <p class="text-slate-400 text-sm mt-1 line-clamp-2">Smart notes app with auto-summarization. Turn chaos into clarity instantly.</p>
+                            <div class="mt-3 flex items-center justify-between">
+                                <span class="text-xs text-slate-500">Education</span>
+                                <span class="text-pink-400 font-medium text-sm">Free</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Placeholder Cards for "More" feel -->
+                <div class="glass-card rounded-2xl p-5 opacity-50 hover:opacity-100 transition">
+                    <div class="flex items-start gap-4">
+                        <div class="w-16 h-16 bg-slate-700 rounded-xl flex items-center justify-center text-slate-400 text-2xl shrink-0">?</div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-lg text-slate-300">Coming Soon</h3>
+                            <p class="text-slate-500 text-sm mt-1">More apps are being developed.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Hidden Categories Page (demonstrating simple SPA routing) -->
+        <div id="categories" class="page-section hidden">
+            <h2 class="text-2xl font-bold text-white mb-6">Explore Categories</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
+                    <span class="block text-xl mb-1">🤖</span>
+                    <span class="font-semibold text-white">AI & Machine Learning</span>
+                </button>
+                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
+                    <span class="block text-xl mb-1">⚡</span>
+                    <span class="font-semibold text-white">Productivity</span>
+                </button>
+                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
+                    <span class="block text-xl mb-1">🎨</span>
+                    <span class="font-semibold text-white">Design</span>
+                </button>
+                <button class="glass-card p-6 rounded-xl text-left hover:bg-slate-700/50">
+                    <span class="block text-xl mb-1">🛠️</span>
+                    <span class="font-semibold text-white">Utilities</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- App Detail Modal -->
+    <div id="appModal" class="modal fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="glass-card w-full max-w-2xl rounded-2xl relative overflow-hidden flex flex-col md:flex-row max-h-[90vh] shadow-2xl bg-slate-900 border-slate-700">
+            
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Modal Left: Info -->
+            <div class="p-6 md:p-8 flex-1 overflow-y-auto">
+                <div id="modalContent">
+                    <!-- Content injected via JS -->
+                </div>
+            </div>
+
+            <!-- Modal Right: Action (Visual Sidebar on desktop, bottom on mobile) -->
+            <div class="bg-slate-800/50 p-6 md:p-8 border-t md:border-t-0 md:border-l border-slate-700 flex flex-col justify-center items-center gap-4 min-w-[200px]">
+                <div id="modalPrice" class="text-2xl font-bold text-white">$0.00</div>
+                <div class="flex gap-2 w-full">
+                    <button class="btn-primary flex-1 text-white font-semibold py-2.5 rounded-lg shadow-lg">Get</button>
+                </div>
+                <div class="text-xs text-slate-400 text-center">One-time purchase</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App Data Store
+        const apps = {
+            dotbot: {
+                name: "DotBot",
+                icon: "🤖",
+                iconColor: "bg-indigo-600",
+                category: "Utility / AI",
+                price: "Free",
+                tag: "Local AI",
+                description: "DotBot brings the power of Large Language Models directly to your desktop without the cloud. Your data never leaves your machine.",
+                features: [
+                    "Runs Llama 2 & Mistral models",
+                    "100% Offline & Private",
+                    "Easy to use UI",
+                    "Extension support",
+                    "GPU Acceleration"
+                ],
+                screenshotBg: "bg-indigo-900/40"
+            },
+            vibe: {
+                name: "VibeLauncher",
+                icon: "◎",
+                iconColor: "bg-emerald-600",
+                category: "Productivity",
+                price: "$4.99",
+                tag: "Minimal",
+                description: "Strip away the noise. VibeLauncher reimagines your desktop as a calm, focused space. No widgets, no clutter, just your tools.",
+                features: [
+                    "Radical minimalism",
+                    "Dynamic wallpaper sync",
+                    "Keyboard-first navigation",
+                    "Tiny memory footprint",
+                    "Dark & Light modes"
+                ],
+                screenshotBg: "bg-emerald-900/40"
+            },
+            notes: {
+                name: "DotNotes",
+                icon: "📝",
+                iconColor: "bg-pink-600",
+                category: "Education",
+                price: "Free",
+                tag: "Smart Notes",
+                description: "Write freely, then let AI do the heavy lifting. DotNotes analyzes your text to generate summaries, flashcards, and action items.",
+                features: [
+                    "Real-time AI summary",
+                    "Smart tagging system",
+                    "Markdown export",
+                    "End-to-end encryption",
+                    "Cross-device sync"
+                ],
+                screenshotBg: "bg-pink-900/40"
+            }
+        };
+
+        // Show App Details Modal
+        function showAppDetails(appId) {
+            const app = apps[appId];
+            if (!app) return;
+
+            const modal = document.getElementById('appModal');
+            const content = document.getElementById('modalContent');
+            const price = document.getElementById('modalPrice');
+
+            // Generate HTML
+            content.innerHTML = `
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 ${app.iconColor} rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                        ${app.icon}
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">${app.name}</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs text-slate-400">${app.category}</span>
+                            <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
+                            <span class="text-xs font-medium text-indigo-400">${app.tag}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="${app.screenshotBg} w-full h-32 rounded-lg mb-6 flex items-center justify-center text-slate-500 border border-slate-700/50 relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <span class="font-mono text-sm opacity-50">App Preview Area</span>
+                </div>
+
+                <p class="text-slate-300 leading-relaxed mb-6">${app.description}</p>
+
+                <h4 class="text-white font-semibold mb-3">Key Features</h4>
+                <ul class="space-y-2">
+                    ${app.features.map(f => `
+                        <li class="flex items-center gap-2 text-slate-400 text-sm">
+                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            ${f}
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+
+            price.textContent = app.price;
+            
+            // Animation
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('appModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Simple SPA Router
+        function openPage(pageId) {
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(sec => {
+                if (sec.id === pageId) {
+                    sec.classList.remove('hidden');
+                    // Small fade in effect
+                    sec.classList.add('animate-fade-in');
+                } else {
+                    sec.classList.add('hidden');
+                }
+            });
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+    </script>
+</body>
+</html>
