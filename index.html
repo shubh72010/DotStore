@@ -3,723 +3,623 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DotStore - App Store</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>DotStore OS 98</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        /* --- FONTS & VARIABLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        :root {
+            --gray-light: #c0c0c0;
+            --gray-dark: #808080;
+            --blue-header: #000080; /* Windows 95 Blue */
+            --white: #ffffff;
+            --black: #000000;
+            --text-color: #000000;
+            --highlight: #1084d0;
+            --error: #800000;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #008080; /* Classic Teal Background */
+            font-family: 'VT323', monospace;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- UTILS: 3D BORDERS --- */
+        .border-outset {
+            border: 2px solid;
+            border-color: var(--white) var(--black) var(--black) var(--white);
+        }
         
-        body { font-family: 'Inter', sans-serif; }
+        .border-inset {
+            border: 2px solid;
+            border-color: var(--black) var(--white) var(--white) var(--black);
+            background: var(--gray-light);
+        }
+
+        .border-header {
+            background: linear-gradient(90deg, var(--blue-header), #2a52be);
+            border-bottom: 2px solid var(--black);
+            color: var(--white);
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-90s {
+            background: var(--gray-light);
+            border: 2px solid;
+            border-color: var(--white) var(--black) var(--black) var(--white);
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            padding: 2px 12px;
+            cursor: pointer;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .btn-90s:active {
+            border-color: var(--black) var(--white) var(--white) var(--black);
+            padding: 3px 11px; /* Shift effect */
+            background: #dcdcdc;
+            transform: translateY(1px);
+        }
         
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+        .btn-90s:focus {
+            outline: 1px dotted var(--black);
+            outline-offset: -4px;
         }
 
-        .app-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .btn-90s:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #b0b0b0;
+            color: #555;
         }
 
-        .app-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        .btn-blue {
+            background: #000080;
+            color: white;
+            border-color: #fff #000 #000 #fff;
         }
 
-        .skeleton {
-            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .install-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            transition: all 0.2s;
-        }
-
-        .install-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-
-        .install-btn.installed {
-            background: #10b981;
-        }
-
-        .modal-backdrop {
-            backdrop-filter: blur(8px);
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .floating {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-
-        .badge {
-            font-size: 0.65rem;
-            letter-spacing: 0.025em;
-        }
-
-        .app-icon-wrapper {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .app-icon-wrapper:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .screenshot-slider {
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .screenshot-slider::-webkit-scrollbar {
-            display: none;
-        }
-
-        .category-pill {
-            transition: all 0.2s;
+        .btn-close {
+            width: 18px; 
+            height: 18px; 
+            line-height: 14px; 
+            text-align: center; 
+            font-weight: bold;
+            background: var(--gray-light);
+            border: 2px solid;
+            border-color: var(--white) var(--black) var(--black) var(--white);
             cursor: pointer;
         }
+        .btn-close:active {
+            border-color: var(--black) var(--white) var(--white) var(--black);
+        }
 
-        .category-pill:hover, .category-pill.active {
-            background: #1f2937;
+        /* --- MAIN WINDOW --- */
+        #desktop-area {
+            flex: 1;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        #store-window {
+            width: 600px;
+            max-width: 95%;
+            background: var(--gray-light);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+            animation: popIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 10;
+        }
+
+        .window-content {
+            padding: 10px;
+        }
+
+        /* --- APP STORE UI --- */
+        .store-header {
+            padding: 8px;
+            background: #e0e0e0;
+            border-bottom: 1px solid #808080;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        /* Custom Scrollbar */
+        .app-list::-webkit-scrollbar { width: 14px; }
+        .app-list::-webkit-scrollbar-track { background: var(--gray-light); border-left: 1px solid #808080; }
+        .app-list::-webkit-scrollbar-thumb { background: var(--gray-light); border: 2px solid; border-color: var(--white) var(--black) var(--black) var(--white); }
+        .app-list::-webkit-scrollbar-thumb:active { border-color: var(--black) var(--white) var(--white) var(--black); }
+
+        .app-card {
+            display: grid;
+            grid-template-columns: 60px 1fr 120px;
+            gap: 10px;
+            padding: 8px;
+            background: #fff;
+            border: 1px solid #808080;
+            align-items: center;
+        }
+
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            background: #000080;
+            border: 2px solid #fff;
+            box-shadow: -1px -1px 0 #808080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             color: white;
         }
 
-        .nav-link {
-            transition: all 0.2s;
+        .app-info h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--blue-header);
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: #111827;
-            border-bottom: 2px solid #111827;
+        .app-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #444;
         }
 
-        .search-highlight {
-            background-color: #fef3c7;
-            padding: 0 2px;
-            border-radius: 2px;
+        .app-action {
+            text-align: right;
         }
 
-        .hero-gradient {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+        /* --- PROGRESS BAR --- */
+        .status-area {
+            margin-top: 5px;
+            font-size: 1rem;
+            color: #333;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .app-detail-icon {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        .progress-container {
+            flex: 1;
+            height: 16px;
+            background: #fff;
+            border: 1px inset #808080;
+            overflow: hidden;
+            display: none; /* Hidden until active */
         }
 
-        .screenshot-image {
-            width: 200px;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #000080;
+            transition: width 0.1s linear;
+        }
+
+        /* --- TASKBAR --- */
+        #taskbar {
+            height: 38px;
+            background: var(--gray-light);
+            border-top: 2px solid var(--white);
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            gap: 4px;
+            z-index: 100;
+        }
+
+        .start-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            height: 30px;
+            border: 2px solid;
+            border-color: var(--white) var(--black) var(--black) var(--white);
+            background: var(--gray-light);
+        }
+
+        .start-btn:active {
+            border-color: var(--black) var(--white) var(--white) var(--black);
+            padding-top: 4px;
+        }
+
+        .taskbar-divider {
+            width: 2px;
+            height: 26px;
+            background: #808080;
+            border-right: 1px solid #fff;
+            margin: 0 2px;
+        }
+
+        .taskbar-app {
+            padding: 2px 10px;
+            border: 2px solid;
+            border-color: var(--white) var(--black) var(--black) var(--white);
+            background: var(--gray-light);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-width: 120px;
+        }
+
+        .taskbar-app.active {
+            border-color: var(--black) var(--white) var(--white) var(--black);
+            font-weight: bold;
+            padding-top: 3px;
+            background: #dcdcdc;
+        }
+
+        .taskbar-clock {
+            margin-left: auto;
+            border: 2px solid;
+            border-color: var(--white) var(--black) var(--black) var(--white);
+            background: #fff;
+            padding: 2px 8px;
+            font-size: 1rem;
+            margin-right: 2px;
+        }
+
+        /* --- CRT OVERLAY --- */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 900;
+            opacity: 0.3;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* --- NOTIFICATIONS --- */
+        .toast {
+            position: fixed;
+            bottom: 50px;
+            right: 20px;
+            background: #ffffe1;
+            border: 2px solid;
+            border-color: var(--black) var(--white) var(--white) var(--black);
+            padding: 10px;
+            width: 280px;
+            font-size: 1rem;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+            z-index: 200;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .blink-text {
+            animation: blink 1s step-end infinite;
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <!-- Navigation -->
-    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center gap-2">
-                        <div class="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-cube text-white"></i>
-                        </div>
-                        <span class="font-bold text-xl text-gray-900">DotStore</span>
-                    </div>
-                    <div class="hidden md:ml-8 md:flex md:space-x-4">
-                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Today">Today</a>
-                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Games">Games</a>
-                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Apps">Apps</a>
-                        <a href="#" class="nav-link text-gray-500 inline-flex items-center px-1 pt-1 text-sm font-medium" data-filter="Arcade">Arcade</a>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="relative hidden md:block">
-                        <input type="text" id="searchInput" placeholder="Search apps..." 
-                               class="pl-9 pr-4 py-1.5 bg-gray-100 border-transparent focus:bg-white focus:border-blue-500 rounded-full text-sm w-64 transition-all">
-                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <!-- CRT Effect Overlay -->
+    <div class="scanlines"></div>
 
-    <!-- Main Content -->
-    <main class="pt-20 pb-8">
+    <!-- Desktop Area -->
+    <div id="desktop-area">
         
-        <!-- Hero Section -->
-        <div class="hero-gradient border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div class="grid md:grid-cols-2 gap-8 items-center">
+        <!-- Main Store Window -->
+        <div id="store-window" class="border-outset">
+            <!-- Header -->
+            <div class="border-header">
+                <span>DotStore 98 - Application Launcher</span>
+                <div class="btn-close" onclick="closeStore()">X</div>
+            </div>
+
+            <!-- Menu Bar (Visual Only) -->
+            <div style="background: var(--gray-light); border-bottom: 1px solid #808080; padding: 2px 5px; font-size: 0.9rem;">
+                File Edit View Help
+            </div>
+
+            <!-- Content -->
+            <div class="window-content">
+                <div class="store-header">
                     <div>
-                        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                            Discover amazing <br>
-                            <span class="gradient-text">AI-powered apps</span>
-                        </h1>
-                        <p class="text-gray-600 text-lg mb-6">
-                            The best collection of productivity and lifestyle apps built for the modern era. 
-                            Handpicked quality apps for your daily needs.
-                        </p>
-                        <div class="flex gap-3">
-                            <span class="px-3 py-1 bg-gray-900 text-white rounded-full text-sm font-medium">Featured</span>
-                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">New Apps</span>
-                        </div>
+                        <strong>Available Software</strong> (3 Items)
                     </div>
-                    <div class="relative hidden md:block">
-                        <div class="absolute -top-6 -right-6 w-32 h-32 bg-purple-200 rounded-full opacity-50 floating"></div>
-                        <div class="absolute -bottom-4 -left-4 w-24 h-24 bg-blue-200 rounded-full opacity-50 floating" style="animation-delay: 1s;"></div>
-                        <div class="relative bg-white rounded-3xl shadow-xl p-8 transform rotate-2 border border-gray-100">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div class="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center text-white text-xl">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-900">DotBot</div>
-                                    <div class="text-sm text-gray-500">Run AI locally</div>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="h-2 bg-gray-100 rounded w-3/4"></div>
-                                <div class="h-2 bg-gray-100 rounded w-1/2"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Categories -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex gap-3 overflow-x-auto pb-2" id="categoryContainer">
-                <button class="category-pill active px-4 py-2 rounded-full bg-gray-900 text-white text-sm font-medium whitespace-nowrap">All</button>
-                <button class="category-pill px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium whitespace-nowrap">Productivity</button>
-                <button class="category-pill px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium whitespace-nowrap">Utilities</button>
-                <button class="category-pill px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium whitespace-nowrap">Developer</button>
-            </div>
-        </div>
-
-        <!-- App Grid -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-900">Essential Apps</h2>
-                <button id="seeAllBtn" class="text-blue-600 text-sm font-medium hover:text-blue-800">See All</button>
-            </div>
-            
-            <div id="appGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Apps will be injected here by JS -->
-            </div>
-        </div>
-
-        <!-- Featured Section -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-gray-900 rounded-3xl p-8 text-white overflow-hidden relative">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
-                
-                <div class="relative z-10">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-bold">FEATURED</span>
-                        <span class="text-gray-400 text-sm">App of the Day</span>
-                    </div>
-                    <h2 class="text-3xl font-bold mb-2">DotBuild</h2>
-                    <p class="text-gray-300 mb-6 max-w-lg">Create beautiful websites with AI. Just describe what you want and get a fully functional site in seconds. The future of web development is here.</p>
-                    <button onclick="openAppModal('dotbuild')" class="bg-white text-gray-900 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors">
-                        Learn More
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- App Modal -->
-    <div id="appModal" class="hidden fixed inset-0 z-[100] overflow-y-auto modal-backdrop" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
-                
-                <!-- Modal Header -->
-                <div class="bg-gray-50 px-6 py-5 border-b border-gray-200 flex justify-between items-start">
-                    <div class="flex gap-4">
-                        <div id="modalIcon" class="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center text-white text-2xl shadow-lg">
-                        </div>
-                        <div>
-                            <h3 id="modalTitle" class="text-xl font-bold text-gray-900"></h3>
-                            <p id="modalSubtitle" class="text-sm text-gray-500"></p>
-                        </div>
-                    </div>
-                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
+                    <div style="font-size: 0.8rem; color: #666;">Connected via 56k Modem...</div>
                 </div>
 
-                <!-- Modal Body -->
-                <div class="px-6 py-6 overflow-y-auto max-h-[60vh]">
-                    <!-- Screenshots -->
-                    <div class="mb-6">
-                        <div class="flex gap-3 overflow-x-auto screenshot-slider pb-2" id="modalScreenshots">
-                            <!-- Screenshots injected here -->
+                <div class="app-list" id="app-list">
+                    <!-- App 1: DotBot -->
+                    <div class="app-card border-inset" id="card-dotbot">
+                        <div class="app-icon" style="background:linear-gradient(135deg, #4b0082, #000080);">🤖</div>
+                        <div class="app-info">
+                            <h3>DotBot</h3>
+                            <p>Run Al locally. Secure, fast, offline.</p>
+                        </div>
+                        <div class="app-action">
+                            <button class="btn-90s" onclick="installApp('dotbot', this)">Download</button>
                         </div>
                     </div>
 
-                    <!-- Info -->
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="font-bold text-gray-900 mb-2">About</h4>
-                            <p id="modalDescription" class="text-gray-600 leading-relaxed"></p>
+                    <!-- App 2: VibeLauncher -->
+                    <div class="app-card border-inset" id="card-vibelauncher">
+                        <div class="app-icon" style="background:linear-gradient(135deg, #333, #111);">🧩</div>
+                        <div class="app-info">
+                            <h3>VibeLauncher</h3>
+                            <p>Minimalist homescreen interface.</p>
                         </div>
-
-                        <div>
-                            <h4 class="font-bold text-gray-900 mb-2">Information</h4>
-                            <div class="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Developer</span>
-                                    <span id="modalDeveloper" class="font-medium text-gray-900"></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Category</span>
-                                    <span id="modalCategory" class="font-medium text-gray-900"></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Size</span>
-                                    <span id="modalSize" class="font-medium text-gray-900"></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Age Rating</span>
-                                    <span id="modalAge" class="font-medium text-gray-900"></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Price</span>
-                                    <span id="modalPrice" class="font-bold text-blue-600"></span>
-                                </div>
-                            </div>
+                        <div class="app-action">
+                            <button class="btn-90s" onclick="installApp('vibelauncher', this)">Download</button>
                         </div>
+                    </div>
 
-                        <div>
-                            <h4 class="font-bold text-gray-900 mb-2">What's New</h4>
-                            <p id="modalWhatsNew" class="text-gray-600 text-sm"></p>
+                    <!-- App 3: DotNotes -->
+                    <div class="app-card border-inset" id="card-dotnotes">
+                        <div class="app-icon" style="background:linear-gradient(135deg, #006400, #008000);">📝</div>
+                        <div class="app-info">
+                            <h3>DotNotes</h3>
+                            <p>Smart notes with Al summary engine.</p>
+                        </div>
+                        <div class="app-action">
+                            <button class="btn-90s" onclick="installApp('dotnotes', this)">Download</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modal Footer -->
-                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end items-center">
-                    <button id="modalInstallBtn" class="install-btn text-white px-8 py-2.5 rounded-full font-semibold shadow-lg flex items-center gap-2">
-                        <i class="fas fa-download"></i>
-                        <span>GET</span>
-                    </button>
+                <!-- Status / Progress Area -->
+                <div class="status-area" id="status-bar">
+                    <span id="status-text" class="blink-text"></span>
+                    <div class="progress-container" id="progress-container">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-8 z-[101] flex items-center gap-3">
-        <i class="fas fa-external-link-alt text-green-400"></i>
-        <span id="toastMessage" class="font-medium"></span>
+    <!-- Taskbar -->
+    <div id="taskbar">
+        <button class="start-btn" onclick="showInfo('Welcome to DotStore OS 98!')">
+            <span>🪟</span> Start
+        </button>
+        <div class="taskbar-divider"></div>
+        
+        <!-- Dynamic Taskbar Items will go here -->
+        <div id="taskbar-items" style="display:flex; gap:2px;"></div>
+
+        <div class="taskbar-clock" id="clock">12:00 PM</div>
     </div>
 
     <script>
-        // App Data
-        const apps = [
-            {
-                id: 'dotbot',
-                name: 'DotBot',
-                subtitle: 'Run AI locally on your device',
-                icon: 'fa-robot',
-                iconBg: 'bg-gray-900',
-                category: 'Utilities',
-                description: 'DotBot brings the power of local AI directly to your device. Run language models, generate images, and process data without relying on cloud services. Privacy-first, blazing fast, and offline capable.',
-                developer: 'DotAI Corp',
-                size: '245 MB',
-                age: '4+',
-                price: 'Free',
-                screenshots: ['bg-gray-800', 'bg-gray-700', 'bg-gray-600'],
-                whatsNew: 'Added support for new LLM models, improved inference speed by 40%, and dark mode UI enhancements.',
-                tags: ['AI', 'Offline', 'Privacy'],
-                featured: true,
-                githubUrl: 'https://github.com/dotai/dotbot'
-            },
-            {
-                id: 'vibelauncher',
-                name: 'VibeLauncher',
-                subtitle: 'Minimalist homescreen launcher',
-                icon: 'fa-rocket',
-                iconBg: 'bg-purple-600',
-                category: 'Lifestyle',
-                description: 'Transform your device into a distraction-free zone. VibeLauncher offers a radically minimal interface that focuses on what matters. Custom widgets, gesture controls, and beautiful typography.',
-                developer: 'Vibe Studios',
-                size: '89 MB',
-                age: '4+',
-                price: 'Free',
-                screenshots: ['bg-purple-700', 'bg-purple-600', 'bg-purple-500'],
-                whatsNew: 'New gesture navigation system, 20+ new icon packs, and improved battery optimization.',
-                tags: ['Productivity', 'Customization'],
-                featured: false,
-                githubUrl: 'https://github.com/vibestudios/vibelauncher'
-            },
-            {
-                id: 'dotnotes',
-                name: 'DotNotes',
-                subtitle: 'Notes app with AI summary',
-                icon: 'fa-pen-fancy',
-                iconBg: 'bg-blue-600',
-                category: 'Productivity',
-                description: 'Take notes naturally and let AI handle the organization. DotNotes automatically summarizes your thoughts, creates to-do lists, and finds connections between your notes. Smart, simple, and powerful.',
-                developer: 'DotAI Corp',
-                size: '156 MB',
-                age: '4+',
-                price: 'Free',
-                screenshots: ['bg-blue-700', 'bg-blue-600', 'bg-blue-500'],
-                whatsNew: 'AI summary feature improvements, new rich text editor, and iCloud sync support.',
-                tags: ['AI', 'Productivity', 'Notes'],
-                featured: false,
-                githubUrl: 'https://github.com/dotai/dotnotes'
-            },
-            {
-                id: 'dotbuild',
-                name: 'DotBuild',
-                subtitle: 'AI website maker',
-                icon: 'fa-code',
-                iconBg: 'bg-green-600',
-                category: 'Developer',
-                description: 'Describe your dream website and watch it come to life. DotBuild uses advanced AI to generate clean, responsive, and modern websites. No coding required, but export-ready for developers.',
-                developer: 'DotAI Corp',
-                size: '450 MB',
-                age: '12+',
-                price: 'Free',
-                screenshots: ['bg-green-700', 'bg-green-600', 'bg-green-500'],
-                whatsNew: 'Launched with AI-powered design suggestions, component library, and direct deployment.',
-                tags: ['AI', 'Developer', 'Web'],
-                featured: false,
-                githubUrl: 'https://github.com/dotai/dotbuild'
-            }
-        ];
+        // --- Configuration: GitHub Repositories ---
+        const REPO_URLS = {
+            dotbot: "https://github.com/dot-systems/dotbot",
+            vibelauncher: "https://github.com/dot-systems/vibelauncher",
+            dotnotes: "https://github.com/dot-systems/dotnotes"
+        };
 
-        // State
-        let installedApps = new Set();
-        let currentFilter = 'All';
-        let searchTerm = '';
+        // --- Clock Logic ---
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            renderApps();
-            setupEventListeners();
-        });
+        // --- State Management ---
+        const installedApps = new Set();
 
-        function setupEventListeners() {
-            // Search
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                searchTerm = e.target.value.toLowerCase();
-                resetFilters(); // Clear category filters when searching
-                renderApps();
-            });
-
-            // Categories
-            document.getElementById('categoryContainer').addEventListener('click', (e) => {
-                if (e.target.classList.contains('category-pill')) {
-                    // Reset navigation links
-                    resetNavLinks();
-                    // Update category pills
-                    updateCategoryPills(e.target.textContent);
-                    currentFilter = e.target.textContent;
-                    searchTerm = ''; // Clear search on category change
-                    document.getElementById('searchInput').value = '';
-                    renderApps();
-                }
-            });
-
-            // Navigation Links (Today, Games, Apps, Arcade)
-            document.getElementById('navLinksContainer')?.addEventListener('click', handleNavClick);
-            // Add event listener directly to nav links as container might not exist
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    handleNavClick(e);
-                });
-            });
-
-            // See All Button
-            document.getElementById('seeAllBtn').addEventListener('click', () => {
-                updateCategoryPills('All');
-                resetNavLinks();
-                currentFilter = 'All';
-                searchTerm = '';
-                document.getElementById('searchInput').value = '';
-                renderApps();
-                showToast('Showing all apps');
-            });
-
-            // Modal Install Button
-            document.getElementById('modalInstallBtn').addEventListener('click', function() {
-                const appName = document.getElementById('modalTitle').textContent;
-                const appId = this.getAttribute('data-app-id');
-                const app = apps.find(a => a.id === appId);
-                
-                if (app && app.githubUrl) {
-                    // Mark as installed
-                    if (!installedApps.has(appId)) {
-                        installedApps.add(appId);
-                        updateInstallButton(this, true);
-                        updateAppCardButton(appId, true);
+        // --- Actions ---
+        function closeStore() {
+            const win = document.getElementById('store-window');
+            win.style.opacity = '0';
+            win.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                // Reopen logic (just to be nice)
+                if(confirm("Close DotStore? You can reopen it from the Start menu.")) {
+                    win.style.display = 'none';
+                    // Add a "Store" shortcut to taskbar if not there
+                    if(!document.getElementById('tb-store')) {
+                        addStoreToTaskbar();
                     }
-                    // Open GitHub page
-                    window.open(app.githubUrl, '_blank');
-                    showToast(`Opening ${appName} on GitHub`);
-                }
-            });
-
-            // Close modal on backdrop click
-            document.getElementById('appModal').addEventListener('click', (e) => {
-                if (e.target.id === 'appModal') {
-                    closeModal();
-                }
-            });
-        }
-
-        function handleNavClick(e) {
-            const link = e.target.closest('.nav-link');
-            if (!link) return;
-
-            e.preventDefault();
-            const filter = link.getAttribute('data-filter');
-
-            // Update active state for nav links
-            resetNavLinks();
-            link.classList.add('active', 'text-gray-900');
-            link.classList.remove('text-gray-500');
-
-            // Reset category pills
-            resetCategoryPills();
-
-            currentFilter = filter;
-            searchTerm = '';
-            document.getElementById('searchInput').value = '';
-            renderApps();
-            showToast(`Filtered by ${filter}`);
-        }
-
-        function renderApps() {
-            const grid = document.getElementById('appGrid');
-            
-            // Filter apps
-            let filteredApps = apps.filter(app => {
-                // Search Filter
-                const matchesSearch = app.name.toLowerCase().includes(searchTerm) || 
-                                     app.subtitle.toLowerCase().includes(searchTerm) ||
-                                     app.tags.some(tag => tag.toLowerCase().includes(searchTerm));
-                
-                // Category/Tab Filter
-                let matchesCategory = false;
-                if (currentFilter === 'All') {
-                    matchesCategory = true;
-                } else if (currentFilter === 'Today') {
-                    matchesCategory = app.featured;
-                } else if (currentFilter === 'Apps' || currentFilter === 'Productivity' || currentFilter === 'Utilities' || currentFilter === 'Developer') {
-                    matchesCategory = app.category === currentFilter || app.tags.includes(currentFilter);
                 } else {
-                    // Games, Arcade, Lifestyle
-                    matchesCategory = app.category === currentFilter;
+                    win.style.opacity = '1';
+                    win.style.transform = 'scale(1)';
                 }
+            }, 200);
+        }
 
-                return matchesCategory && matchesSearch;
-            });
+        function addStoreToTaskbar() {
+            const tb = document.getElementById('taskbar-items');
+            const btn = document.createElement('div');
+            btn.className = 'taskbar-app';
+            btn.id = 'tb-store';
+            btn.innerHTML = '<span>📦</span> DotStore';
+            btn.onclick = () => {
+                const win = document.getElementById('store-window');
+                if(win.style.display === 'none') {
+                    win.style.display = 'block';
+                    win.style.opacity = '1';
+                    win.style.transform = 'scale(1)';
+                }
+                // Visual active state toggle
+                btn.classList.add('active');
+                setTimeout(() => btn.classList.remove('active'), 200);
+            };
+            tb.appendChild(btn);
+        }
 
-            if (filteredApps.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <div class="text-6xl mb-4">🔍</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">No apps found</h3>
-                        <p class="text-gray-500">Try adjusting your search or filters</p>
-                    </div>
-                `;
+        function showInfo(msg) {
+            if(!document.getElementById('toast')) {
+                const toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'toast';
+                toast.innerHTML = `<strong>System</strong><br>${msg}<br><br><button class="btn-90s" onclick="this.parentElement.remove()">OK</button>`;
+                document.body.appendChild(toast);
+            }
+        }
+
+        // --- Installation Logic (Redirects to GitHub) ---
+        async function installApp(appId, btn) {
+            if(installedApps.has(appId)) {
+                showInfo(`${appId.toUpperCase()} is already installed. Opening Repo...`);
+                window.open(REPO_URLS[appId], '_blank');
                 return;
             }
 
-            grid.innerHTML = filteredApps.map(app => `
-                <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border border-gray-100 hover:border-gray-200" onclick="openAppModal('${app.id}')">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="app-icon-wrapper w-14 h-14 ${app.iconBg} rounded-xl flex items-center justify-center text-white text-xl shadow-md">
-                            <i class="fas ${app.icon}"></i>
-                        </div>
-                        ${app.featured ? '<span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">NEW</span>' : ''}
-                    </div>
-                    
-                    <h3 class="font-bold text-gray-900 text-sm mb-1 truncate">${app.name}</h3>
-                    <p class="text-gray-500 text-xs mb-3 line-clamp-2 h-8">${app.subtitle}</p>
-                    
-                    <div class="flex items-center justify-between mt-3">
-                        <button onclick="event.stopPropagation(); toggleInstall('${app.id}', this)" 
-                                class="install-btn text-white text-xs px-3 py-1.5 rounded-full font-medium ${installedApps.has(app.id) ? 'installed' : ''}">
-                            ${installedApps.has(app.id) ? '<i class="fas fa-check"></i>' : 'GET'}
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
+            // Disable button and card
+            const card = document.getElementById(`card-${appId}`);
+            card.style.opacity = '0.5';
+            btn.disabled = true;
+            btn.textContent = "Wait...";
 
-        function toggleInstall(appId, button) {
-            const app = apps.find(a => a.id === appId);
-            if (!app) return;
+            // UI Elements
+            const statusText = document.getElementById('status-text');
+            const progressContainer = document.getElementById('progress-container');
+            const progressFill = document.getElementById('progress-fill');
 
-            if (installedApps.has(appId)) {
-                // Already installed - open modal
-                openAppModal(appId);
-            } else {
-                // Install
-                installedApps.add(appId);
-                updateInstallButton(button, true);
-                window.open(app.githubUrl, '_blank');
-                showToast(`Opening ${app.name} on GitHub`);
-            }
-        }
+            // Reset Progress
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
 
-        function updateInstallButton(button, installed) {
-            if (installed) {
-                button.classList.add('installed');
-                button.innerHTML = '<i class="fas fa-check"></i>';
-            } else {
-                button.classList.remove('installed');
-                button.innerHTML = 'GET';
-            }
-        }
+            // Phase 1: Connecting
+            statusText.textContent = "Connecting to DotNet...";
+            await sleep(600);
 
-        function updateAppCardButton(appId, installed) {
-            const gridButtons = document.querySelectorAll(`[onclick*="toggleInstall('${appId}'"]`);
-            gridButtons.forEach(btn => {
-                if (installed) {
-                    btn.classList.add('installed');
-                    btn.innerHTML = '<i class="fas fa-check"></i>';
+            // Phase 2: Downloading
+            statusText.textContent = `Downloading ${appId}.exe...`;
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 12; // Faster download
+                if(progress > 100) progress = 100;
+                progressFill.style.width = `${progress}%`;
+
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    // Trigger Redirect immediately after 100%
+                    handleRedirect(appId, btn, card, statusText);
                 }
-            });
+            }, 80);
         }
 
-        function openAppModal(appId) {
-            const app = apps.find(a => a.id === appId);
-            if (!app) return;
+        function handleRedirect(appId, btn, card, statusText) {
+            statusText.textContent = "Transfer Complete. Redirecting...";
+            statusText.style.color = "#000080";
+            statusText.classList.remove('blink-text');
 
-            document.getElementById('modalTitle').textContent = app.name;
-            document.getElementById('modalSubtitle').textContent = app.subtitle;
-            document.getElementById('modalDescription').textContent = app.description;
-            document.getElementById('modalDeveloper').textContent = app.developer;
-            document.getElementById('modalCategory').textContent = app.category;
-            document.getElementById('modalSize').textContent = app.size;
-            document.getElementById('modalAge').textContent = app.age;
-            document.getElementById('modalPrice').textContent = app.price;
-            document.getElementById('modalWhatsNew').textContent = app.whatsNew;
+            // Add to Taskbar to simulate "ownership"
+            addToTaskbar(appId);
+            installedApps.add(appId);
             
-            const iconEl = document.getElementById('modalIcon');
-            iconEl.className = `w-16 h-16 ${app.iconBg} rounded-xl flex items-center justify-center text-white text-2xl shadow-lg app-detail-icon`;
-            iconEl.innerHTML = `<i class="fas ${app.icon}"></i>`;
-
-            const screenshotsContainer = document.getElementById('modalScreenshots');
-            screenshotsContainer.innerHTML = app.screenshots.map(color => `
-                <div class="screenshot-image ${color} flex-shrink-0 flex items-center justify-center text-white/20 text-3xl">
-                    <i class="fas fa-image"></i>
-                </div>
-            `).join('');
-
-            const installBtn = document.getElementById('modalInstallBtn');
-            installBtn.setAttribute('data-app-id', appId);
-            const isInstalled = installedApps.has(appId);
-            updateInstallButton(installBtn, isInstalled);
-            installBtn.querySelector('span').textContent = isInstalled ? 'VIEW' : 'GET';
-
-            const modal = document.getElementById('appModal');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('appModal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
+            // Restore button state
+            btn.textContent = "Open GitHub";
+            btn.style.background = "#000080";
+            btn.style.color = "#fff";
+            btn.disabled = false; // Re-enable to allow manual redirect if needed
             
-            toastMessage.textContent = message;
-            toast.style.opacity = '1';
-            toast.style.transform = 'translate(-50%, 0)';
-            
+            // Update onclick to direct GitHub link
+            btn.onclick = () => {
+                window.open(REPO_URLS[appId], '_blank');
+            };
+
+            // Visual restoration
+            card.style.opacity = '1';
+
+            // Perform the actual redirect after a very short delay (so user sees "Complete")
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, 2rem)';
-            }, 3000);
+                // Open GitHub in a new tab
+                window.open(REPO_URLS[appId], '_blank');
+                
+                // Reset status text
+                document.getElementById('progress-container').style.display = 'none';
+                statusText.textContent = "Ready.";
+                statusText.style.color = "#000";
+            }, 800);
         }
 
-        // --- UI State Helper Functions ---
+        function addToTaskbar(appId) {
+            const container = document.getElementById('taskbar-items');
+            
+            const appInfo = {
+                dotbot: { icon: '🤖', name: 'DotBot' },
+                vibelauncher: { icon: '🧩', name: 'Vibe' },
+                dotnotes: { icon: '📝', name: 'Notes' }
+            };
 
-        function updateCategoryPills(filter) {
-            document.querySelectorAll('.category-pill').forEach(btn => {
-                if (btn.textContent === filter) {
-                    btn.classList.add('active', 'bg-gray-900', 'text-white');
-                    btn.classList.remove('bg-white', 'text-gray-700');
-                } else {
-                    btn.classList.remove('active', 'bg-gray-900', 'text-white');
-                    btn.classList.add('bg-white', 'text-gray-700');
-                }
-            });
+            const info = appInfo[appId];
+            if(!info) return;
+
+            // Check if already in taskbar (shouldn't happen but safe guard)
+            if(document.getElementById(`tb-${appId}`)) return;
+
+            const item = document.createElement('div');
+            item.className = 'taskbar-app';
+            item.id = `tb-${appId}`;
+            item.innerHTML = `<span>${info.icon}</span> ${info.name}`;
+            item.onclick = function() {
+                // Opens Repo on click
+                this.classList.add('active');
+                window.open(REPO_URLS[appId], '_blank');
+                setTimeout(() => this.classList.remove('active'), 200);
+            };
+
+            container.appendChild(item);
         }
 
-        function resetCategoryPills() {
-            document.querySelectorAll('.category-pill').forEach(btn => {
-                btn.classList.remove('active', 'bg-gray-900', 'text-white');
-                btn.classList.add('bg-white', 'text-gray-700');
-            });
-            // Set 'All' as active
-            const allBtn = document.querySelector('.category-pill');
-            if (allBtn) {
-                allBtn.classList.add('active', 'bg-gray-900', 'text-white');
-                allBtn.classList.remove('bg-white', 'text-gray-700');
-            }
+        // Utility
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        function resetNavLinks() {
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active', 'text-gray-900');
-                link.classList.add('text-gray-500');
-            });
-        }
-
-        function resetFilters() {
-            currentFilter = 'All';
-            resetCategoryPills();
-            resetNavLinks();
-        }
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
     </script>
 </body>
 </html>
