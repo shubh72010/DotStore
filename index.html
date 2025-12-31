@@ -1,8 +1,7 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DotStore OS 98</title>
     <style>
         /* --- FONTS & VARIABLES --- */
@@ -22,6 +21,7 @@
         * {
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -30,6 +30,7 @@
             background-color: #008080; /* Classic Teal Background */
             font-family: 'VT323', monospace;
             height: 100vh;
+            height: 100dvh; /* Dynamic viewport height */
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -58,6 +59,7 @@
             font-size: 1.3rem;
             font-weight: bold;
             letter-spacing: 1px;
+            touch-action: none; /* Allows dragging on mobile without scrolling */
         }
 
         /* --- BUTTONS --- */
@@ -71,6 +73,9 @@
             cursor: pointer;
             outline: none;
             text-transform: uppercase;
+            transition: all 0.1s;
+            min-height: 36px; /* Touch target size */
+            min-width: 44px;
         }
 
         .btn-90s:active {
@@ -99,41 +104,49 @@
         }
 
         .btn-close {
-            width: 18px; 
-            height: 18px; 
-            line-height: 14px; 
-            text-align: center; 
+            width: 24px;   
+            height: 24px;   
+            line-height: 20px;   
+            text-align: center;   
             font-weight: bold;
             background: var(--gray-light);
             border: 2px solid;
             border-color: var(--white) var(--black) var(--black) var(--white);
             cursor: pointer;
-        }
-        .btn-close:active {
-            border-color: var(--black) var(--white) var(--white) var(--black);
+            opacity: 0.3; /* Visual indicator it's inactive */
+            pointer-events: none; /* Disable clicks */
         }
 
         /* --- MAIN WINDOW --- */
         #desktop-area {
             flex: 1;
             position: relative;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            overflow-y: auto; /* Allow scrolling if content overflows */
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         #store-window {
-            width: 600px;
-            max-width: 95%;
+            width: 100%;
+            max-width: 600px;
             background: var(--gray-light);
             box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
             animation: popIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
             z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: auto; /* Allow height to adjust */
+            max-height: 100%; /* Prevent exceeding viewport */
         }
 
         .window-content {
             padding: 10px;
+            overflow-y: auto; /* Scroll inside window if needed */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* --- APP STORE UI --- */
@@ -144,6 +157,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .app-list {
@@ -151,16 +167,15 @@
             flex-direction: column;
             gap: 8px;
             margin-top: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 4px;
+            /* Removed max-height to let window handle scrolling */
+            overflow-y: visible; 
         }
 
-        /* Custom Scrollbar */
-        .app-list::-webkit-scrollbar { width: 14px; }
-        .app-list::-webkit-scrollbar-track { background: var(--gray-light); border-left: 1px solid #808080; }
-        .app-list::-webkit-scrollbar-thumb { background: var(--gray-light); border: 2px solid; border-color: var(--white) var(--black) var(--black) var(--white); }
-        .app-list::-webkit-scrollbar-thumb:active { border-color: var(--black) var(--white) var(--white) var(--black); }
+        /* Custom Scrollbar (Desktop mainly) */
+        .window-content::-webkit-scrollbar { width: 14px; }
+        .window-content::-webkit-scrollbar-track { background: var(--gray-light); border-left: 1px solid #808080; }
+        .window-content::-webkit-scrollbar-thumb { background: var(--gray-light); border: 2px solid; border-color: var(--white) var(--black) var(--black) var(--white); }
+        .window-content::-webkit-scrollbar-thumb:active { border-color: var(--black) var(--white) var(--white) var(--black); }
 
         .app-card {
             display: grid;
@@ -170,6 +185,31 @@
             background: #fff;
             border: 1px solid #808080;
             align-items: center;
+        }
+
+        /* Mobile adjustments for App Card */
+        @media (max-width: 600px) {
+            .app-card {
+                grid-template-columns: 50px 1fr; /* Stack icon and info */
+                grid-template-rows: auto auto; /* Define rows */
+                gap: 5px;
+                padding: 10px;
+            }
+            .app-card .app-action {
+                grid-column: 1 / -1; /* Button spans full width */
+                text-align: left;
+                margin-top: 5px;
+                display: flex;
+                justify-content: flex-end; /* Align button right */
+            }
+            .app-info h3 { font-size: 1.1rem; }
+            .app-info p { font-size: 0.85rem; }
+            
+            /* Make buttons bigger for touch */
+            .app-card .btn-90s {
+                padding: 5px 15px;
+                font-size: 1.2rem;
+            }
         }
 
         .app-icon {
@@ -210,6 +250,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            padding-bottom: 5px;
         }
 
         .progress-container {
@@ -230,7 +271,7 @@
 
         /* --- TASKBAR --- */
         #taskbar {
-            height: 38px;
+            height: 42px; /* Slightly larger on mobile */
             background: var(--gray-light);
             border-top: 2px solid var(--white);
             display: flex;
@@ -238,19 +279,23 @@
             padding: 2px;
             gap: 4px;
             z-index: 100;
+            overflow-x: auto; /* Scroll taskbar if many apps */
+            -webkit-overflow-scrolling: touch;
+            flex-shrink: 0;
         }
 
         .start-btn {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 0 8px;
+            padding: 0 10px;
             font-size: 1.2rem;
             font-weight: bold;
-            height: 30px;
+            height: 34px;
             border: 2px solid;
             border-color: var(--white) var(--black) var(--black) var(--white);
             background: var(--gray-light);
+            white-space: nowrap;
         }
 
         .start-btn:active {
@@ -264,6 +309,7 @@
             background: #808080;
             border-right: 1px solid #fff;
             margin: 0 2px;
+            flex-shrink: 0;
         }
 
         .taskbar-app {
@@ -277,6 +323,8 @@
             align-items: center;
             gap: 5px;
             min-width: 120px;
+            height: 34px;
+            flex-shrink: 0; /* Don't shrink */
         }
 
         .taskbar-app.active {
@@ -294,6 +342,10 @@
             padding: 2px 8px;
             font-size: 1rem;
             margin-right: 2px;
+            white-space: nowrap;
+            height: 34px;
+            display: flex;
+            align-items: center;
         }
 
         /* --- CRT OVERLAY --- */
@@ -319,13 +371,14 @@
         /* --- NOTIFICATIONS --- */
         .toast {
             position: fixed;
-            bottom: 50px;
+            bottom: 60px; /* Above taskbar */
             right: 20px;
             background: #ffffe1;
             border: 2px solid;
             border-color: var(--black) var(--white) var(--white) var(--black);
             padding: 10px;
             width: 280px;
+            max-width: calc(100% - 40px);
             font-size: 1rem;
             box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
             animation: slideIn 0.3s ease-out;
@@ -354,8 +407,8 @@
         <div id="store-window" class="border-outset">
             <!-- Header -->
             <div class="border-header">
-                <span>DotStore 98 - Application Launcher</span>
-                <div class="btn-close" onclick="closeStore()">X</div>
+                <span>DotStore 98</span>
+                <div class="btn-close">X</div>
             </div>
 
             <!-- Menu Bar (Visual Only) -->
@@ -369,7 +422,7 @@
                     <div>
                         <strong>Available Software</strong> (3 Items)
                     </div>
-                    <div style="font-size: 0.8rem; color: #666;">Connected via 56k Modem...</div>
+                    <div style="font-size: 0.8rem; color: #666;">56k Modem...</div>
                 </div>
 
                 <div class="app-list" id="app-list">
@@ -378,7 +431,7 @@
                         <div class="app-icon" style="background:linear-gradient(135deg, #4b0082, #000080);">🤖</div>
                         <div class="app-info">
                             <h3>DotBot</h3>
-                            <p>Run Al locally. Secure, fast, offline.</p>
+                            <p>Run Al locally. Secure, fast.</p>
                         </div>
                         <div class="app-action">
                             <button class="btn-90s" onclick="installApp('dotbot', this)">Download</button>
@@ -390,7 +443,7 @@
                         <div class="app-icon" style="background:linear-gradient(135deg, #333, #111);">🧩</div>
                         <div class="app-info">
                             <h3>VibeLauncher</h3>
-                            <p>Minimalist homescreen interface.</p>
+                            <p>Minimalist homescreen.</p>
                         </div>
                         <div class="app-action">
                             <button class="btn-90s" onclick="installApp('vibelauncher', this)">Download</button>
@@ -402,7 +455,7 @@
                         <div class="app-icon" style="background:linear-gradient(135deg, #006400, #008000);">📝</div>
                         <div class="app-info">
                             <h3>DotNotes</h3>
-                            <p>Smart notes with Al summary engine.</p>
+                            <p>Smart notes engine.</p>
                         </div>
                         <div class="app-action">
                             <button class="btn-90s" onclick="installApp('dotnotes', this)">Download</button>
@@ -435,11 +488,11 @@
     </div>
 
     <script>
-        // --- Configuration: GitHub Repositories ---
+        // --- Configuration: GitHub Repositories & Files ---
         const REPO_URLS = {
-            dotbot: "https://github.com/dot-systems/dotbot",
-            vibelauncher: "https://github.com/dot-systems/vibelauncher",
-            dotnotes: "https://github.com/dot-systems/dotnotes"
+            dotbot: "https://github.com/shubh72010/DotStore/blob/main/DotNotes_V0.0.5.apk",
+            vibelauncher: "https://drive.google.com/uc?export=download&id=1BFCGuR1bWLMCCFPlzqI9j9tRraijnlRe",
+            dotnotes: "https://drive.google.com/uc?export=download&id=1K4SvPhOYzu_OjtDgMuXuHbY8ICJ3f3g_"
         };
 
         // --- Clock Logic ---
@@ -459,25 +512,8 @@
         const installedApps = new Set();
 
         // --- Actions ---
-        function closeStore() {
-            const win = document.getElementById('store-window');
-            win.style.opacity = '0';
-            win.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                // Reopen logic (just to be nice)
-                if(confirm("Close DotStore? You can reopen it from the Start menu.")) {
-                    win.style.display = 'none';
-                    // Add a "Store" shortcut to taskbar if not there
-                    if(!document.getElementById('tb-store')) {
-                        addStoreToTaskbar();
-                    }
-                } else {
-                    win.style.opacity = '1';
-                    win.style.transform = 'scale(1)';
-                }
-            }, 200);
-        }
-
+        // Removed closeStore() function as requested
+        
         function addStoreToTaskbar() {
             const tb = document.getElementById('taskbar-items');
             const btn = document.createElement('div');
@@ -487,7 +523,7 @@
             btn.onclick = () => {
                 const win = document.getElementById('store-window');
                 if(win.style.display === 'none') {
-                    win.style.display = 'block';
+                    win.style.display = 'flex'; // Changed to flex to maintain column layout
                     win.style.opacity = '1';
                     win.style.transform = 'scale(1)';
                 }
@@ -536,7 +572,7 @@
             await sleep(600);
 
             // Phase 2: Downloading
-            statusText.textContent = `Downloading ${appId}.exe...`;
+            statusText.textContent = `Downloading ${appId}.apk...`;
             let progress = 0;
             const interval = setInterval(() => {
                 progress += Math.random() * 12; // Faster download
@@ -546,7 +582,7 @@
                 if(progress >= 100) {
                     clearInterval(interval);
                     // Trigger Redirect immediately after 100%
-                    handleRedirect(appId, btn, card, statusText);
+                    handleRedirect(appId, btn,card, statusText);
                 }
             }, 80);
         }
@@ -565,7 +601,7 @@
             btn.style.background = "#000080";
             btn.style.color = "#fff";
             btn.disabled = false; // Re-enable to allow manual redirect if needed
-            
+
             // Update onclick to direct GitHub link
             btn.onclick = () => {
                 window.open(REPO_URLS[appId], '_blank');
@@ -578,7 +614,7 @@
             setTimeout(() => {
                 // Open GitHub in a new tab
                 window.open(REPO_URLS[appId], '_blank');
-                
+
                 // Reset status text
                 document.getElementById('progress-container').style.display = 'none';
                 statusText.textContent = "Ready.";
@@ -588,7 +624,7 @@
 
         function addToTaskbar(appId) {
             const container = document.getElementById('taskbar-items');
-            
+
             const appInfo = {
                 dotbot: { icon: '🤖', name: 'DotBot' },
                 vibelauncher: { icon: '🧩', name: 'Vibe' },
@@ -622,4 +658,4 @@
 
     </script>
 </body>
-</html>
+</html>               
