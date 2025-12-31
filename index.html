@@ -431,7 +431,7 @@
                         <div class="app-icon" style="background:linear-gradient(135deg, #4b0082, #000080);">🤖</div>
                         <div class="app-info">
                             <h3>DotBot</h3>
-                            <p>Run Al locally. Secure, fast.</p>
+                            <p>Run AI locally. Secure, fast.</p>
                         </div>
                         <div class="app-action">
                             <button class="btn-90s" onclick="installApp('dotbot', this)">Download</button>
@@ -443,7 +443,7 @@
                         <div class="app-icon" style="background:linear-gradient(135deg, #333, #111);">🧩</div>
                         <div class="app-info">
                             <h3>VibeLauncher</h3>
-                            <p>Minimalist homescreen.</p>
+                            <p>HeScreen Launcher based on minimalism (+ Private Space)</p>
                         </div>
                         <div class="app-action">
                             <button class="btn-90s" onclick="installApp('vibelauncher', this)">Download</button>
@@ -455,7 +455,7 @@
                         <div class="app-icon" style="background:linear-gradient(135deg, #006400, #008000);">📝</div>
                         <div class="app-info">
                             <h3>DotNotes</h3>
-                            <p>Smart notes engine.</p>
+                            <p>Smarter notes than ever. (+ AI summarization)</p>
                         </div>
                         <div class="app-action">
                             <button class="btn-90s" onclick="installApp('dotnotes', this)">Download</button>
@@ -476,7 +476,7 @@
 
     <!-- Taskbar -->
     <div id="taskbar">
-        <button class="start-btn" onclick="showInfo('Welcome to DotStore OS 98!')">
+        <button class="start-btn" onclick="showInfo('Welcome to DotStore OS 67!')">
             <span>🪟</span> Start
         </button>
         <div class="taskbar-divider"></div>
@@ -582,7 +582,7 @@
                 if(progress >= 100) {
                     clearInterval(interval);
                     // Trigger Redirect immediately after 100%
-                    handleRedirect(appId, btn,card, statusText);
+                    handleRedirect(appId, btn, card, statusText);
                 }
             }, 80);
         }
@@ -597,7 +597,7 @@
             installedApps.add(appId);
             
             // Restore button state
-            btn.textContent = "Open GitHub";
+            btn.textContent = "Downloaded (hopefully)";
             btn.style.background = "#000080";
             btn.style.color = "#fff";
             btn.disabled = false; // Re-enable to allow manual redirect if needed
@@ -617,7 +617,7 @@
 
                 // Reset status text
                 document.getElementById('progress-container').style.display = 'none';
-                statusText.textContent = "Ready.";
+                statusText.textContent = "Boom! 💥💥🧀";
                 statusText.style.color = "#000";
             }, 800);
         }
